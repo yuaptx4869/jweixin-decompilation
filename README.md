@@ -24,31 +24,31 @@ Manual decompilation JS-SDK of WeChat.
 - [x] hideAllNonBaseMenuItem
 - [x] showAllNonBaseMenuItem
 - [x] scanQRCode
-- [] startRecord
-- [] stopRecord
-- [] onVoiceRecordEnd
-- [] playVoice
-- [] pauseVoice
-- [] stopVoice
-- [] onVoicePlayEnd
-- [] uploadVoice
-- [] downloadVoice
-- [] translateVoice
-- [] chooseImage
-- [] previewImage
-- [] uploadImage
-- [] downloadImage
-- [] getLocalImgData
-- [] openLocation
-- [] openAddress
-- [] openProductSpecificView
-- [] addCard
-- [] chooseCard
-- [] openCard
-- [] consumeAndShareCard
-- [] chooseWXPay
-- [] openEnterpriseRedPacket
-- [] startSearchBeacons
-- [] stopSearchBeacons
-- [] onSearchBeacons
-- [] openEnterpriseChat
+- [ ] startRecord
+- [ ] stopRecord
+- [ ] onVoiceRecordEnd
+- [ ] playVoice
+- [ ] pauseVoice
+- [ ] stopVoice
+- [ ] onVoicePlayEnd
+- [ ] uploadVoice
+- [ ] downloadVoice
+- [ ] translateVoice
+- [ ] chooseImage
+- [ ] previewImage
+- [ ] uploadImage
+- [ ] downloadImage
+- [ ] getLocalImgData
+- [ ] openLocation
+- [ ] openAddress
+- [ ] openProductSpecificView
+- [ ] addCard
+- [ ] chooseCard
+- [ ] openCard
+- [ ] consumeAndShareCard
+- [ ] chooseWXPay
+- [ ] openEnterpriseRedPacket
+- [ ] startSearchBeacons
+- [ ] stopSearchBeacons
+- [ ] onSearchBeacons
+- [ ] openEnterpriseChat
