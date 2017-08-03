@@ -2,6 +2,7 @@
 Manual decompilation JS-SDK of WeChat.
 
 人肉反编译微信JS-SDK
+
 [微信JS-SDK说明文档](https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141115)
 
 完成情况
