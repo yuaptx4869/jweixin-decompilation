@@ -159,7 +159,7 @@
 			isWeixinDeBugger = uaLowerCase.indexOf('wxdebugger') != -1,
 			isWeixin = uaLowerCase.indexOf('micromessenger') != -1,
 			isAndroid = uaLowerCase.indexOf('android') != -1,
-			isIos = uaLowerCase.indexOf('iphone') != -1 || uaLowerCase.indexOf('ipad') != -1,
+			isIOs = uaLowerCase.indexOf('iphone') != -1 || uaLowerCase.indexOf('ipad') != -1,
 			weixinVersion = (function() {
 				var version = uaLowerCase.match(/micromessenger\/(\d+\.\d+\.\d+)/) || uaLowerCase.match(/micromessenger\/(\d+\.\d+)/);
 				return version ? version[1] : ''
@@ -177,7 +177,7 @@
 				preVerifyTime: 0,
 				networkType: "",
 				isPreVerifyOk: 1,
-				systemType: isIos ? 1 : isAndroid ? 2 : -1,
+				systemType: isIOs ? 1 : isAndroid ? 2 : -1,
 				clientVersion: weixinVersion,
 				url: encodeURIComponent(location.href)
 			},
@@ -190,9 +190,7 @@
 				data: {}
 			};
 
-		var G = !1,
-			H = [],
-			jWeixin = {
+		var jWeixin = {
 				config: function(data) {
 					settings = data;
 					logEventData("config", data);
@@ -403,7 +401,7 @@
 						scanType: data.scanType || ["qrCode", "barCode"]
 					}, function() {
 						data._complete = function(res) {
-							if (isIos) {
+							if (isIOs) {
 								var resultStr = res.resultStr;
 								if (resultStr) {
 									var result = JSON.parse(resultStr);
