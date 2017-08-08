@@ -3,17 +3,17 @@
 		return factory(global)
 	}) : factory(global, true)
 }(this, function(global, isGlobalMode) {
-	function invoke(operation, data, handler) {
-		global.WeixinJSBridge ? WeixinJSBridge.invoke(operation, addVerifyInfo(data), function(res) {
-			execute(operation, res, handler)
-		}) : logEventInfo(operation, handler);
+	function invoke(sdkName, data, handler) {
+		global.WeixinJSBridge ? WeixinJSBridge.invoke(sdkName, addVerifyInfo(data), function(res) {
+			execute(sdkName, res, handler)
+		}) : logEventInfo(sdkName, handler);
 	}
 
-	function on(operation, listener, handler) {
-		global.WeixinJSBridge ? WeixinJSBridge.on(operation, function(res) {
+	function on(sdkName, listener, handler) {
+		global.WeixinJSBridge ? WeixinJSBridge.on(sdkName, function(res) {
 			handler && handler.trigger && handler.trigger(res);
-			execute(operation, res, listener);
-		}) : (handler ? logEventInfo(operation, handler) : logEventInfo(operation, listener));
+			execute(sdkName, res, listener);
+		}) : (handler ? logEventInfo(sdkName, handler) : logEventInfo(sdkName, listener));
 	}
 
 	function addVerifyInfo(data) {
@@ -28,11 +28,11 @@
 		return data;
 	}
 
-	function execute(operation, res, handler) {
-		"openEnterpriseChat" == operation && (res.errCode = res.err_code);
+	function execute(sdkName, res, handler) {
+		"openEnterpriseChat" == sdkName && (res.errCode = res.err_code);
 		delete res.err_code, delete res.err_desc, delete res.err_detail;
 		var errMsg = res.errMsg;
-		errMsg || (errMsg = res.err_msg, delete res.err_msg, errMsg = formatErrMsg(operation, errMsg), res.errMsg = errMsg);
+		errMsg || (errMsg = res.err_msg, delete res.err_msg, errMsg = formatErrMsg(sdkName, errMsg), res.errMsg = errMsg);
 		handler = handler || {};
 		handler._complete && (handler._complete(res), delete handler._complete);
 		errMsg = res.errMsg || "";
@@ -52,9 +52,9 @@
 		handler.complete && handler.complete(res)
 	}
 
-	function formatErrMsg(operation, errMsg) {
-		var name = operation,
-			event = operationEventMap[operation];
+	function formatErrMsg(sdkName, errMsg) {
+		var name = sdkName,
+			event = sdkNameEventMap[sdkName];
 		event && (name = event);
 		var status = "ok";
 		if (errMsg) {
@@ -65,18 +65,18 @@
 			status = status.replace(/_/g, " ");
 			status = status.toLowerCase();
 			("access denied" == status || "no permission to execute" == status) && (status = "permission denied");
-			"config" == operation && "function not exist" == status && (status = "ok");
+			"config" == sdkName && "function not exist" == status && (status = "ok");
 			"" == status && (status = "fail");
 		}
 		return errMsg = name + ":" + status;
 	}
 
-	function eventArrToOperationArr(jsApiList) {
+	function eventArrToSdkNameArr(jsApiList) {
 		if (jsApiList) {
 			for (var i = 0, length = jsApiList.length; length > i; ++i) {
-				var eventName = jsApiList[i],
-					operationName = eventOperationMap[eventName];
-				operationName && (jsApiList[i] = operationName);
+				var event = jsApiList[i],
+					sdkName = eventSdkNameMap[event];
+				sdkName && (jsApiList[i] = sdkName);
 			}
 			return jsApiList;
 		}
@@ -84,8 +84,8 @@
 
 	function logEventInfo(name, data) {
 		if (!(!settings.debug || data && data.isInnerInvoke)) {
-			var eventName = operationEventMap[name];
-			eventName && (name = eventName);
+			var event = sdkNameEventMap[name];
+			event && (name = event);
 			data && data._complete && delete data._complete;
 			console.log('"' + name + '",', data || "")
 		}
@@ -117,15 +117,15 @@
 	}
 
 	function enableBetaApi() {
-		jWeixin.invoke || (jWeixin.invoke = function(operation, data, handler) {
-			global.WeixinJSBridge && WeixinJSBridge.invoke(operation, addVerifyInfo(data), handler)
-		}, jWeixin.on = function(operation, data) {
-			global.WeixinJSBridge && WeixinJSBridge.on(operation, data)
+		jWeixin.invoke || (jWeixin.invoke = function(sdkName, data, handler) {
+			global.WeixinJSBridge && WeixinJSBridge.invoke(sdkName, addVerifyInfo(data), handler)
+		}, jWeixin.on = function(sdkName, data) {
+			global.WeixinJSBridge && WeixinJSBridge.on(sdkName, data)
 		});
 	}
 
 	if (!global.jWeixin) {
-		var eventOperationMap = {
+		var eventSdkNameMap = {
 				config: "preVerifyJSAPI",
 				onMenuShareTimeline: "menu:share:timeline",
 				onMenuShareAppMessage: "menu:share:appmessage",
@@ -145,10 +145,10 @@
 				consumeAndShareCard: "consumedShareCard",
 				openAddress: "editAddress"
 			},
-			operationEventMap = (function() {
+			sdkNameEventMap = (function() {
 				var map = {};
-				for (var i in eventOperationMap)
-					map[eventOperationMap[i]] = i;
+				for (var i in eventSdkNameMap)
+					map[eventSdkNameMap[i]] = i;
 				return map;
 			})(),
 			document = global.document,
@@ -197,8 +197,8 @@
 					var needCheck = settings.check === false ? false : true;
 					startup(function() {
 						if (needCheck) {
-							invoke(eventOperationMap.config, {
-								verifyJsApiList: eventArrToOperationArr(settings.jsApiList)
+							invoke(eventSdkNameMap.config, {
+								verifyJsApiList: eventArrToSdkNameArr(settings.jsApiList)
 							}, function() {
 								handler._complete = function(data) {
 									loadTimeInfo.preVerifyEndTime = getTime();
@@ -245,13 +245,13 @@
 					var formatResultData = function(data) {
 						var checkResult = data.checkResult;
 						for (var key in checkResult) {
-							var event = operationEventMap[key];
+							var event = sdkNameEventMap[key];
 							event && (checkResult[event] = checkResult[key], delete checkResult[key]);
 						}
 						return data;
 					};
 					invoke("checkJsApi", {
-						jsApiList: eventArrToOperationArr(data.jsApiList)
+						jsApiList: eventArrToSdkNameArr(data.jsApiList)
 					}, function() {
 						data._complete = function(data) {
 							if (isAndroid) {
@@ -264,7 +264,7 @@
 					}());
 				},
 				onMenuShareTimeline: function(data) {
-					on(eventOperationMap.onMenuShareTimeline, {
+					on(eventSdkNameMap.onMenuShareTimeline, {
 						complete: function() {
 							invoke("shareTimeline", {
 								title: data.title || title,
@@ -278,7 +278,7 @@
 					}, data);
 				},
 				onMenuShareAppMessage: function(data) {
-					on(eventOperationMap.onMenuShareAppMessage, {
+					on(eventSdkNameMap.onMenuShareAppMessage, {
 						complete: function() {
 							invoke("sendAppMessage", {
 								title: data.title || title,
@@ -292,7 +292,7 @@
 					}, data);
 				},
 				onMenuShareQQ: function(data) {
-					on(eventOperationMap.onMenuShareQQ, {
+					on(eventSdkNameMap.onMenuShareQQ, {
 						complete: function() {
 							invoke("shareQQ", {
 								title: data.title || title,
@@ -304,7 +304,7 @@
 					}, data);
 				},
 				onMenuShareWeibo: function(data) {
-					on(eventOperationMap.onMenuShareWeibo, {
+					on(eventSdkNameMap.onMenuShareWeibo, {
 						complete: function() {
 							invoke("shareWeiboApp", {
 								title: data.title || title,
@@ -316,7 +316,7 @@
 					}, data);
 				},
 				onMenuShareQZone: function(data) {
-					on(eventOperationMap.onMenuShareQZone, {
+					on(eventSdkNameMap.onMenuShareQZone, {
 						complete: function() {
 							invoke("shareQZone", {
 								title: data.title || title,
@@ -359,7 +359,7 @@
 				},
 				getLocation: function(data) {
 					data = data || {};
-					invoke(eventOperationMap.getLocation, {
+					invoke(eventSdkNameMap.getLocation, {
 						type: data.type || "wgs84"
 					}, function() {
 						data._complete = function(res) {
