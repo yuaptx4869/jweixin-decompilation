@@ -6,14 +6,14 @@
 	function invoke(operation, data, handler) {
 		global.WeixinJSBridge ? WeixinJSBridge.invoke(operation, addVerifyInfo(data), function(res) {
 			execute(operation, res, handler)
-		}) : logEventData(operation, handler);
+		}) : logEventInfo(operation, handler);
 	}
 
 	function on(operation, listener, handler) {
 		global.WeixinJSBridge ? WeixinJSBridge.on(operation, function(res) {
 			handler && handler.trigger && handler.trigger(res);
 			execute(operation, res, listener);
-		}) : (handler ? logEventData(operation, handler) : logEventData(operation, listener));
+		}) : (handler ? logEventInfo(operation, handler) : logEventInfo(operation, listener));
 	}
 
 	function addVerifyInfo(data) {
@@ -82,7 +82,7 @@
 		}
 	}
 
-	function logEventData(name, data) {
+	function logEventInfo(name, data) {
 		if (!(!settings.debug || data && data.isInnerInvoke)) {
 			var eventName = operationEventMap[name];
 			eventName && (name = eventName);
@@ -193,7 +193,7 @@
 		var jWeixin = {
 				config: function(data) {
 					settings = data;
-					logEventData("config", data);
+					logEventInfo("config", data);
 					var needCheck = settings.check === false ? false : true;
 					startup(function() {
 						if (needCheck) {
