@@ -3,8 +3,8 @@
 		return factory(global)
 	}) : factory(global, true)
 }(this, function(global, isGlobalMode) {
-	function invoke(sdkName, data, handler) {
-		global.WeixinJSBridge ? WeixinJSBridge.invoke(sdkName, addVerifyInfo(data), function(res) {
+	function invoke(sdkName, args, handler) {
+		global.WeixinJSBridge ? WeixinJSBridge.invoke(sdkName, addVerifyInfo(args), function(res) {
 			execute(sdkName, res, handler)
 		}) : logEventInfo(sdkName, handler);
 	}
@@ -117,10 +117,10 @@
 	}
 
 	function enableBetaApi() {
-		jWeixin.invoke || (jWeixin.invoke = function(sdkName, data, handler) {
-			global.WeixinJSBridge && WeixinJSBridge.invoke(sdkName, addVerifyInfo(data), handler)
-		}, jWeixin.on = function(sdkName, data) {
-			global.WeixinJSBridge && WeixinJSBridge.on(sdkName, data)
+		jWeixin.invoke || (jWeixin.invoke = function(sdkName, args, handler) {
+			global.WeixinJSBridge && WeixinJSBridge.invoke(sdkName, addVerifyInfo(args), handler)
+		}, jWeixin.on = function(sdkName, args) {
+			global.WeixinJSBridge && WeixinJSBridge.on(sdkName, args)
 		});
 	}
 
